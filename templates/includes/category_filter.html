@@ -1,0 +1,23 @@
+{% comment %}
+  Category filter (FR-FI-01 to FR-FI-04). Works as plain links, so it needs no JavaScript.
+  Expects: categories, selected_slug, filter_url (base URL for the current page), anchor (optional).
+{% endcomment %}
+<nav class="category-filter" aria-label="Filter by category">
+  <ul class="filter-list">
+    <li>
+      <a class="filter-chip{% if not selected_slug %} is-selected{% endif %}" href="{{ filter_url }}{% if anchor %}#{{ anchor }}{% endif %}"{% if not selected_slug %} aria-current="true"{% endif %}>All places</a>
+    </li>
+    {% for category in categories %}
+    <li>
+      <a class="filter-chip{% if category.slug == selected_slug %} is-selected{% endif %}" style="--chip-colour: {{ category.colour_hex }}"
+         href="{{ filter_url }}?category={{ category.slug|urlencode }}{% if anchor %}#{{ anchor }}{% endif %}"{% if category.slug == selected_slug %} aria-current="true"{% endif %}>
+        <span class="chip-dot" aria-hidden="true"></span>{{ category.name }}
+        <span class="chip-count">{{ category.place_count }}<span class="visually-hidden"> place{{ category.place_count|pluralize }}</span></span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if selected_slug %}
+  <a class="filter-clear" href="{{ filter_url }}{% if anchor %}#{{ anchor }}{% endif %}"><i class="bi bi-x-circle" aria-hidden="true"></i> Clear filter</a>
+  {% endif %}
+</nav>

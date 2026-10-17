@@ -1,0 +1,71 @@
+{% load static %}<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{% block meta_description %}Find places to visit within {{ NEARBYGO_RADIUS_KM|floatformat:0 }} km of Panadura and plan a simple one-day trip.{% endblock %}">
+  <title>{% block title %}NearbyGo{% endblock %} | NearbyGo Panadura</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  {% block extra_head %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/nearbygo.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="visually-hidden-focusable skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <nav class="navbar navbar-expand-md" aria-label="Main navigation">
+      <div class="container">
+        <a class="navbar-brand brand" href="{% url 'places:list' %}">
+          <span class="brand-mark" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+          <span class="brand-text">NearbyGo<span class="brand-sub">Panadura</span></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Show menu">
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+        {% with url_name=request.resolver_match.url_name ns=request.resolver_match.namespace %}
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link{% if ns == 'places' and url_name == 'list' or ns == 'places' and url_name == 'detail' %} active{% endif %}" href="{% url 'places:list' %}"{% if ns == 'places' and url_name == 'list' %} aria-current="page"{% endif %}>Places</a></li>
+            <li class="nav-item"><a class="nav-link{% if url_name == 'map' %} active{% endif %}" href="{% url 'places:map' %}"{% if url_name == 'map' %} aria-current="page"{% endif %}>Map</a></li>
+            <li class="nav-item">
+              <a class="nav-link nav-plan{% if ns == 'planner' %} active{% endif %}" href="{% url 'planner:plan' %}"{% if ns == 'planner' and url_name == 'plan' %} aria-current="page"{% endif %}>
+                My plan <span class="plan-count" aria-hidden="true">{{ plan_count }}</span><span class="visually-hidden">, {{ plan_count }} place{{ plan_count|pluralize }}</span>
+              </a>
+            </li>
+            <li class="nav-item"><a class="nav-link{% if url_name == 'about' %} active{% endif %}" href="{% url 'places:about' %}"{% if url_name == 'about' %} aria-current="page"{% endif %}>Help</a></li>
+          </ul>
+        </div>
+        {% endwith %}
+      </div>
+    </nav>
+  </header>
+
+  {% include "includes/messages.html" %}
+
+  <main id="main" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <p class="footer-note">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          Distances, opening hours, fees and tips are guidance only. Confirm time-sensitive details with the venue before you travel.
+        </p>
+        <ul class="footer-links">
+          <li><a href="{% url 'places:about' %}">How to use NearbyGo</a></li>
+          <li><a href="{% url 'places:map' %}">Map</a></li>
+          <li><a href="https://www.openstreetmap.org/copyright" rel="noopener">Map data &copy; OpenStreetMap contributors</a></li>
+        </ul>
+      </div>
+      <p class="footer-small">NearbyGo version 1.0, built for the ITE2953 Programming Group Project.</p>
+    </div>
+  </footer>
+
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

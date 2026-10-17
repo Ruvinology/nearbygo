@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="container narrow">
+    <div class="empty-state empty-state-large">
+      <i class="bi bi-signpost-split" aria-hidden="true"></i>
+      <h1>We couldn't find that page</h1>
+      <p>The place may have been removed or is no longer listed, or the address may be mistyped.</p>
+      <div class="hero-actions justify-content-center">
+        <a class="btn btn-primary" href="{% url 'places:list' %}">Browse places</a>
+        <a class="btn btn-outline-primary" href="{% url 'places:map' %}">Open the map</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

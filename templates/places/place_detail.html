@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static nearbygo %}
+
+{% block title %}{{ place.name }}{% endblock %}
+{% block meta_description %}{{ place.summary }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">
+{% endblock %}
+
+{% block content %}
+<article class="place-detail" style="--colour: {{ place.category.colour_hex }}" aria-labelledby="place-title">
+  <header class="detail-head">
+    <div class="container">
+      <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'places:list' %}">Places</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'places:list' %}?category={{ place.category.slug|urlencode }}#places">{{ place.category.name }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ place.name }}</li>
+        </ol>
+      </nav>
+      <p class="place-category"><span class="chip-dot" aria-hidden="true"></span>{{ place.category.name }}</p>
+      <h1 id="place-title">{{ place.name }}</h1>
+      <p class="lead">{{ place.summary }}</p>
+      <ul class="detail-facts">
+        <li><i class="bi bi-signpost-2" aria-hidden="true"></i> About {{ place.distance_km|km }} from Panadura</li>
+        {% if place.visit_duration_minutes %}<li><i class="bi bi-clock" aria-hidden="true"></i> Allow {{ place.visit_duration_minutes|duration }}</li>{% endif %}
+      </ul>
+    </div>
+  </header>
+
+  <div class="container detail-grid">
+    <div class="detail-main">
+      {% if place.image %}
+      <figure class="detail-figure">
+        <img src="{{ place.image.url }}" alt="{{ place.image_alt }}" width="1280" height="720">
+        {% if place.image_credit %}<figcaption>{{ place.image_credit }}</figcaption>{% endif %}
+      </figure>
+      {% endif %}
+
+      <section aria-labelledby="about-title">
+        <h2 id="about-title">About this place</h2>
+        <div class="prose">{{ place.description|linebreaks }}</div>
+      </section>
+
+      <section aria-labelledby="visit-title">
+        <h2 id="visit-title">Visiting information</h2>
+        {% if place.is_verified %}
+        <p class="verify-note is-verified"><i class="bi bi-patch-check" aria-hidden="true"></i> Checked with the venue on {{ place.info_verified_on|date:"j F Y" }}. Details can change, so confirm before you travel.</p>
+        {% else %}
+        <p class="verify-note"><i class="bi bi-exclamation-diamond" aria-hidden="true"></i> <strong>Not yet verified.</strong> These hours, fees and facilities have not been confirmed with the venue. Check with them before you travel.</p>
+        {% endif %}
+        <dl class="info-list">
+          <div><dt>Opening hours</dt><dd>{% if place.opening_hours %}{{ place.opening_hours }}{% else %}<span class="unavailable">Not available</span>{% endif %}</dd></div>
+          <div><dt>Entrance fee</dt><dd>{% if place.entrance_fee %}{{ place.entrance_fee }}{% else %}<span class="unavailable">Not available</span>{% endif %}</dd></div>
+          <div><dt>Recommended visit</dt><dd>{% if place.visit_duration_minutes %}{{ place.visit_duration_minutes|duration }}{% else %}<span class="unavailable">Not available</span>{% endif %}</dd></div>
+          <div><dt>Best time to visit</dt><dd>{% if place.best_time_to_visit %}{{ place.best_time_to_visit }}{% else %}<span class="unavailable">Not available</span>{% endif %}</dd></div>
+          <div><dt>Student discount</dt><dd>{% if place.student_discount %}{{ place.student_discount }}{% else %}<span class="unavailable">Not available</span>{% endif %}</dd></div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="facilities-title">
+        <h2 id="facilities-title">Facilities</h2>
+        <ul class="facility-list">
+          {% for label, status in place.facility_items %}
+          <li class="facility is-{{ status }}">
+            {% if status == "yes" %}<i class="bi bi-check-circle-fill" aria-hidden="true"></i>{% elif status == "no" %}<i class="bi bi-x-circle" aria-hidden="true"></i>{% else %}<i class="bi bi-question-circle" aria-hidden="true"></i>{% endif %}
+            <span class="facility-label">{{ label }}</span>
+            <span class="facility-status">{% if status == "yes" %}Available{% elif status == "no" %}Not available{% else %}Not verified{% endif %}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% if place.facilities_notes %}<div class="prose">{{ place.facilities_notes|linebreaks }}</div>{% endif %}
+        <h3>Accessibility</h3>
+        {% if place.accessibility %}<div class="prose">{{ place.accessibility|linebreaks }}</div>{% else %}<p class="unavailable">No accessibility information yet.</p>{% endif %}
+      </section>
+
+      <section aria-labelledby="travel-title">
+        <h2 id="travel-title">Getting there and tips</h2>
+        <h3>Transport</h3>
+        {% if place.transport %}<div class="prose">{{ place.transport|linebreaks }}</div>{% else %}<p class="unavailable">No transport information yet.</p>{% endif %}
+        <h3>Families</h3>
+        {% if place.family_suitability %}<div class="prose">{{ place.family_suitability|linebreaks }}</div>{% else %}<p class="unavailable">No family information yet.</p>{% endif %}
+        <h3>Travel tips</h3>
+        {% if place.travel_tips %}<div class="prose">{{ place.travel_tips|linebreaks }}</div>{% else %}<p class="unavailable">No tips yet.</p>{% endif %}
+      </section>
+    </div>
+
+    <aside class="detail-aside" aria-label="Plan and location">
+      <div class="aside-card">
+        {% include "includes/add_to_plan.html" with btn_class="w-100 btn-lg" %}
+        <p class="aside-hint">{% if in_plan %}Change the order on the plan page.{% else %}You can change the order later.{% endif %}</p>
+      </div>
+      <div class="aside-card">
+        <h2 class="aside-title">Location</h2>
+        <div id="place-map" class="mini-map" role="region" aria-label="Map showing {{ place.name }}"></div>
+        <p class="map-status" id="map-status" hidden></p>
+        <noscript><p class="map-status">Turn on JavaScript to see the map.</p></noscript>
+        <ul class="aside-links">
+          <li><a href="{% url 'places:map' %}"><i class="bi bi-map" aria-hidden="true"></i> See it with other places</a></li>
+          <li><a href="https://www.openstreetmap.org/?mlat={{ place.latitude }}&amp;mlon={{ place.longitude }}#map=16/{{ place.latitude }}/{{ place.longitude }}" rel="noopener" target="_blank">
+            <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Open in OpenStreetMap<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  {% if nearby %}
+  <section class="more-section" aria-labelledby="more-title">
+    <div class="container">
+      <h2 id="more-title">More {{ place.category.name|lower }} places</h2>
+      <ul class="place-grid">
+        {% for other in nearby %}
+        <li>{% include "places/_place_card.html" with place=other in_plan=planned_ids|contains:other.pk %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+</article>
+{{ marker|json_script:"place-marker" }}
+{{ NEARBYGO_MAP|json_script:"map-config" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/maps.js' %}"></script>
+<script>
+  NearbyGoMaps.single("place-map", "place-marker", "map-config", "map-status");
+</script>
+{% endblock %}

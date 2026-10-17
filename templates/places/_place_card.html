@@ -1,0 +1,24 @@
+{% load nearbygo %}
+<article class="place-card" style="--colour: {{ place.category.colour_hex }}" aria-labelledby="place-{{ place.pk }}-name">
+  <div class="place-media">
+    {% if place.image %}
+      <img src="{{ place.image.url }}" alt="{{ place.image_alt }}" loading="lazy" decoding="async" width="1280" height="720">
+    {% else %}
+      <div class="place-placeholder" aria-hidden="true"><i class="bi bi-{{ place.category.icon }}"></i></div>
+    {% endif %}
+    <span class="place-distance"><i class="bi bi-signpost-2" aria-hidden="true"></i> {{ place.distance_km|km }}<span class="visually-hidden"> from Panadura</span></span>
+  </div>
+  <div class="place-body">
+    <p class="place-category"><span class="chip-dot" aria-hidden="true"></span>{{ place.category.name }}</p>
+    <h3 class="place-name" id="place-{{ place.pk }}-name"><a href="{{ place.get_absolute_url }}">{{ place.name }}</a></h3>
+    <p class="place-summary">{{ place.summary }}</p>
+    <p class="place-meta">
+      {% if place.visit_duration_minutes %}<span><i class="bi bi-clock" aria-hidden="true"></i> Allow {{ place.visit_duration_minutes|duration }}</span>{% endif %}
+      {% if place.entrance_fee %}<span><i class="bi bi-ticket-perforated" aria-hidden="true"></i> {{ place.entrance_fee|truncatechars:38 }}</span>{% endif %}
+    </p>
+  </div>
+  <div class="place-actions">
+    <a class="btn btn-link-details" href="{{ place.get_absolute_url }}">View details<span class="visually-hidden">: {{ place.name }}</span></a>
+    {% include "includes/add_to_plan.html" with btn_class="btn-sm" %}
+  </div>
+</article>

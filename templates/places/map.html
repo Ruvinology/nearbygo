@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static nearbygo %}
+
+{% block title %}Map of places{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-banner">
+  <div class="container">
+    <h1>Map of places</h1>
+    <p class="lead">Select a marker to see the place name and a link to its details. Drag to move the map and use the + and − buttons to zoom.</p>
+  </div>
+</section>
+
+<section class="map-section" aria-label="Interactive map">
+  <div class="container">
+    {% url 'places:map' as map_url %}
+    {% include "includes/category_filter.html" with filter_url=map_url %}
+    <p class="map-status alert alert-warning" id="map-status" role="status" hidden></p>
+    <noscript><p class="alert alert-warning">The map needs JavaScript. The list of places below still works.</p></noscript>
+    {% if places %}
+    <div id="places-map" class="big-map" role="region" aria-label="Map of {{ places|length }} place{{ places|length|pluralize }} around Panadura"></div>
+    <ul class="map-legend" aria-label="Legend">
+      {% for category in categories %}{% if category.place_count %}
+      <li style="--chip-colour: {{ category.colour_hex }}"><span class="chip-dot" aria-hidden="true"></span>{{ category.name }}</li>
+      {% endif %}{% endfor %}
+      {% if planned_ids %}<li class="legend-plan"><span class="legend-ring" aria-hidden="true"></span>In your plan</li>{% endif %}
+    </ul>
+    {% endif %}
+  </div>
+</section>
+
+<section class="places-section places-section-tight" aria-labelledby="map-list-title">
+  <div class="container">
+    <h2 id="map-list-title">{% if places %}Places on this map{% else %}No places to show{% endif %}</h2>
+    {% if places %}
+    <ol class="map-list">
+      {% for place in places %}
+      <li style="--colour: {{ place.category.colour_hex }}">
+        <a href="{{ place.get_absolute_url }}"><span class="chip-dot" aria-hidden="true"></span>{{ place.name }}</a>
+        <span class="map-list-meta">{{ place.category.name }}, {{ place.distance_km|km }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-map" aria-hidden="true"></i>
+      <h3>{% if selected_slug %}No places in this category{% else %}No places are listed yet{% endif %}</h3>
+      <p>{% if selected_slug %}Choose another category or show every place.{% else %}Places appear here once an administrator publishes them.{% endif %}</p>
+      {% if selected_slug %}<a class="btn btn-primary" href="{% url 'places:map' %}">Show all places</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{{ markers|json_script:"map-markers" }}
+{{ NEARBYGO_MAP|json_script:"map-config" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/maps.js' %}"></script>
+<script>
+  NearbyGoMaps.many("places-map", "map-markers", "map-config", "map-status");
+</script>
+{% endblock %}

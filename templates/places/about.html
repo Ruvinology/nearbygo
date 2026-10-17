@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}How to use NearbyGo{% endblock %}
+
+{% block content %}
+<section class="page-banner">
+  <div class="container narrow">
+    <h1>How to use NearbyGo</h1>
+    <p class="lead">NearbyGo lists places to visit within {{ radius_km|floatformat:0 }} km of Panadura and helps you put a few of them in order for a day out. You don't need an account.</p>
+  </div>
+</section>
+
+<section class="help-section">
+  <div class="container narrow">
+    <ol class="help-steps">
+      <li>
+        <h2>Browse places</h2>
+        <p>The <a href="{% url 'places:list' %}">Places</a> page shows every listed place with its category and approximate distance from Panadura. Choose a category such as Nature or Religious to see only those places. Choose <strong>All places</strong> or <strong>Clear filter</strong> to see everything again.</p>
+      </li>
+      <li>
+        <h2>Read the details</h2>
+        <p>Each place has a description, opening hours, entrance fee, recommended visit time, facilities, transport and travel tips. When something hasn't been confirmed, the page says <em>Not available</em> or <em>Not verified</em> instead of guessing.</p>
+      </li>
+      <li>
+        <h2>Use the map</h2>
+        <p>The <a href="{% url 'places:map' %}">Map</a> shows every place as a coloured marker. Select a marker to see its name and a link to its details. If the map can't load, the list under it still works.</p>
+      </li>
+      <li>
+        <h2>Build your plan</h2>
+        <p>Choose <strong>Add to plan</strong> on any place. On <a href="{% url 'planner:plan' %}">My plan</a> you can move places earlier or later, add an optional arrival time, remove a place or clear the whole plan. Your plan is kept in this browser for about a week, and no personal details are collected.</p>
+      </li>
+    </ol>
+
+    <div class="aside-card guidance-card">
+      <h2 class="aside-title"><i class="bi bi-info-circle" aria-hidden="true"></i> Good to know</h2>
+      <ul>
+        <li>Distances are straight-line estimates from a point in Panadura. Road distances are usually longer.</li>
+        <li>Opening hours, fees and facilities can change. Confirm with the place before you travel, especially on public holidays and Poya days.</li>
+        <li>NearbyGo doesn't sell tickets, take bookings or payments, plan routes, or show live traffic, weather or bus times.</li>
+        <li>Only visit areas that are open to the public, and follow local signs and lifeguard advice at beaches.</li>
+      </ul>
+    </div>
+
+    <h2 class="mt-5">For administrators</h2>
+    <p>Sign in at <a href="{% url 'admin:index' %}">the administration area</a> to add or update categories and places. Each place needs a unique name, a category, a description, coordinates and a distance of {{ radius_km|floatformat:0 }} km or less to be active. Untick <strong>active</strong> to hide a place straight away if its information becomes unsafe or out of date. Set <strong>practical info verified on</strong> after checking hours and fees with the venue.</p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% comment %}Add-to-plan control (FR-VP-01). Expects: place, in_plan, btn_class (optional).{% endcomment %}
+{% if in_plan %}
+  <a class="btn btn-in-plan {{ btn_class }}" href="{% url 'planner:plan' %}">
+    <i class="bi bi-check2-circle" aria-hidden="true"></i> In your plan
+  </a>
+{% else %}
+  <form method="post" action="{% url 'planner:add' %}" class="d-inline">
+    {% csrf_token %}
+    <input type="hidden" name="place_id" value="{{ place.pk }}">
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="btn btn-plan {{ btn_class }}">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> Add to plan<span class="visually-hidden">: {{ place.name }}</span>
+    </button>
+  </form>
+{% endif %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static nearbygo %}
+
+{% block title %}My one-day plan{% endblock %}
+
+{% block extra_head %}
+{% if items %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="page-banner">
+  <div class="container">
+    <h1>My one-day plan</h1>
+    {% if items %}
+    <p class="lead plan-summary">
+      {{ items|length }} place{{ items|length|pluralize }}{% if total_minutes %}, about {{ total_minutes|duration }} of visiting time{% endif %}.
+      Travel between places is not included.
+      {% if missing_duration %}<span class="text-muted-ng">({{ missing_duration }} place{{ missing_duration|pluralize }} without a recommended visit time.)</span>{% endif %}
+    </p>
+    {% else %}
+    <p class="lead">Choose places you'd like to see and they'll appear here in the order you visit them.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="plan-section" aria-label="Plan">
+  <div class="container">
+    {% if items %}
+    <div class="plan-grid">
+      <div>
+        <ol class="plan-list">
+          {% for item in items %}
+          <li class="plan-item" id="item-{{ item.pk }}" style="--colour: {{ item.place.category.colour_hex }}">
+            <span class="plan-number" aria-hidden="true">{{ forloop.counter }}</span>
+            <div class="plan-body">
+              <p class="place-category"><span class="chip-dot" aria-hidden="true"></span>{{ item.place.category.name }}</p>
+              <h2 class="plan-name"><span class="visually-hidden">Stop {{ forloop.counter }}: </span><a href="{{ item.place.get_absolute_url }}">{{ item.place.name }}</a></h2>
+              <ul class="plan-facts">
+                <li><i class="bi bi-signpost-2" aria-hidden="true"></i> {{ item.place.distance_km|km }} from Panadura</li>
+                <li><i class="bi bi-clock" aria-hidden="true"></i> {% if item.place.visit_duration_minutes %}Allow {{ item.place.visit_duration_minutes|duration }}{% else %}<span class="unavailable">Visit time not available</span>{% endif %}</li>
+                {% if item.place.opening_hours %}<li><i class="bi bi-door-open" aria-hidden="true"></i> {{ item.place.opening_hours }}</li>{% endif %}
+              </ul>
+
+              <form method="post" action="{% url 'planner:set_time' item.pk %}" class="plan-time">
+                {% csrf_token %}
+                <label for="time-{{ item.pk }}">Planned arrival <span class="text-muted-ng">(optional)</span></label>
+                <div class="plan-time-row">
+                  <input type="time" class="form-control form-control-sm" id="time-{{ item.pk }}" name="planned_time" value="{{ item.planned_time|time:'H:i' }}">
+                  <button type="submit" class="btn btn-sm btn-outline-secondary">Save time<span class="visually-hidden"> for {{ item.place.name }}</span></button>
+                </div>
+              </form>
+
+              <div class="plan-controls" role="group" aria-label="Change {{ item.place.name }}">
+                <form method="post" action="{% url 'planner:move' item.pk %}">
+                  {% csrf_token %}<input type="hidden" name="direction" value="up">
+                  <button type="submit" class="btn btn-sm btn-outline-primary"{% if forloop.first %} disabled{% endif %}><i class="bi bi-arrow-up" aria-hidden="true"></i> Move earlier<span class="visually-hidden">: {{ item.place.name }}</span></button>
+                </form>
+                <form method="post" action="{% url 'planner:move' item.pk %}">
+                  {% csrf_token %}<input type="hidden" name="direction" value="down">
+                  <button type="submit" class="btn btn-sm btn-outline-primary"{% if forloop.last %} disabled{% endif %}><i class="bi bi-arrow-down" aria-hidden="true"></i> Move later<span class="visually-hidden">: {{ item.place.name }}</span></button>
+                </form>
+                <form method="post" action="{% url 'planner:remove' item.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3" aria-hidden="true"></i> Remove<span class="visually-hidden">: {{ item.place.name }}</span></button>
+                </form>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+
+        <div class="plan-footer-actions">
+          <a class="btn btn-outline-primary" href="{% url 'places:list' %}#places"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add more places</a>
+          <a class="btn btn-link text-danger" href="{% url 'planner:clear' %}">Clear plan</a>
+        </div>
+      </div>
+
+      <aside class="plan-aside" aria-label="Plan map and notes">
+        <div class="aside-card">
+          <h2 class="aside-title">Your stops on the map</h2>
+          <div id="plan-map" class="mini-map plan-map" role="region" aria-label="Map of your plan stops, numbered in visit order"></div>
+          <p class="map-status" id="map-status" hidden></p>
+        </div>
+        <div class="aside-card guidance-card">
+          <h2 class="aside-title"><i class="bi bi-info-circle" aria-hidden="true"></i> This plan is a guide</h2>
+          <p>The order is the one you chose. NearbyGo does not plan routes, check live traffic, weather or bus times, or make bookings. Confirm opening hours with each place before you set off.</p>
+        </div>
+      </aside>
+    </div>
+    {% else %}
+    <div class="empty-state empty-state-large">
+      <i class="bi bi-list-ol" aria-hidden="true"></i>
+      <h2>Your plan is empty</h2>
+      <p>Open a place and choose <strong>Add to plan</strong>. You can then put the places in the order you want to visit them.</p>
+      <div class="hero-actions justify-content-center">
+        <a class="btn btn-primary" href="{% url 'places:list' %}#places">Browse places</a>
+        <a class="btn btn-outline-primary" href="{% url 'places:map' %}">Open the map</a>
+      </div>
+      <p class="guidance-inline">Plans are a guide only: no route planning, live traffic or bookings.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% if items %}
+{{ markers|json_script:"plan-markers" }}
+{{ NEARBYGO_MAP|json_script:"map-config" }}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if items %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'js/maps.js' %}"></script>
+<script>
+  NearbyGoMaps.plan("plan-map", "plan-markers", "map-config", "map-status");
+</script>
+{% endif %}
+{% endblock %}

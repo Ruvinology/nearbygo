@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Clear your plan{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="container narrow">
+    <h1>Clear your plan?</h1>
+    <p class="lead">This removes all {{ count }} place{{ count|pluralize }} from your plan. You can't undo this.</p>
+    <form method="post" action="{% url 'planner:clear' %}" class="confirm-actions">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, clear my plan</button>
+      <a class="btn btn-outline-secondary" href="{% url 'planner:plan' %}">Keep my plan</a>
+    </form>
+  </div>
+</section>
+{% endblock %}
