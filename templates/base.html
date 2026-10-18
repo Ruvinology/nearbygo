@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
   {% block extra_head %}{% endblock %}
-  <link rel="stylesheet" href="{% static 'css/nearbygo.css' %}">
+  <link rel="stylesheet" href="{% static 'css/nearbygo.css' %}?v={{ CSS_VERSION }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <a class="visually-hidden-focusable skip-link" href="#main">Skip to main content</a>

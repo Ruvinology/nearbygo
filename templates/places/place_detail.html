@@ -124,7 +124,7 @@
 
 {% block extra_js %}
 <script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
-<script src="{% static 'js/maps.js' %}"></script>
+<script src="{% static 'js/maps.js' %}?v={{ JS_VERSION }}"></script>
 <script>
   NearbyGoMaps.single("place-map", "place-marker", "map-config", "map-status");
 </script>

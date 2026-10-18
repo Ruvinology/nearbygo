@@ -110,7 +110,7 @@
 {% block extra_js %}
 {% if items %}
 <script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
-<script src="{% static 'js/maps.js' %}"></script>
+<script src="{% static 'js/maps.js' %}?v={{ JS_VERSION }}"></script>
 <script>
   NearbyGoMaps.plan("plan-map", "plan-markers", "map-config", "map-status");
 </script>

@@ -231,6 +231,10 @@ class OtherPageTests(TestCase):
         r = self.client.get("/places/?category=x")
         self.assertRedirects(r, "/?category=x", fetch_redirect_response=False)
 
+    def test_stylesheet_link_has_version_so_browsers_reload_it(self):
+        r = self.client.get(reverse("places:list"))
+        self.assertRegex(r.content.decode(), r'nearbygo\.css\?v=\d+"')
+
     def test_security_headers(self):
         r = self.client.get(reverse("places:list"))
         self.assertEqual(r["X-Frame-Options"], "DENY")
