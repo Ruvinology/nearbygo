@@ -51,17 +51,49 @@
   <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
-        <p class="footer-note">
-          <i class="bi bi-info-circle" aria-hidden="true"></i>
-          Distances, opening hours, fees and tips are guidance only. Confirm time-sensitive details with the venue before you travel.
-        </p>
-        <ul class="footer-links">
-          <li><a href="{% url 'places:about' %}">How to use NearbyGo</a></li>
-          <li><a href="{% url 'places:map' %}">Map</a></li>
-          <li><a href="https://www.openstreetmap.org/copyright" rel="noopener">Map data &copy; OpenStreetMap contributors</a></li>
-        </ul>
+        <div class="footer-brand">
+          <a class="brand" href="{% url 'places:list' %}">
+            <span class="brand-mark" aria-hidden="true"><i class="bi bi-geo-alt-fill"></i></span>
+            <span class="brand-text">NearbyGo<span class="brand-sub">Panadura</span></span>
+          </a>
+          <p>Beaches, temples and heritage sites around Panadura, with everything you need to plan a day out.</p>
+        </div>
+
+        <nav aria-labelledby="footer-explore">
+          <h2 class="footer-title" id="footer-explore">Explore</h2>
+          <ul class="footer-links">
+            <li><a href="{% url 'places:list' %}">All places</a></li>
+            <li><a href="{% url 'places:map' %}">Map</a></li>
+            <li><a href="{% url 'planner:plan' %}">My plan</a></li>
+            <li><a href="{% url 'places:about' %}">Help</a></li>
+          </ul>
+        </nav>
+
+        {% if footer_categories %}
+        <nav aria-labelledby="footer-categories">
+          <h2 class="footer-title" id="footer-categories">Categories</h2>
+          <ul class="footer-links">
+            {% for category in footer_categories %}
+            <li><a href="{% url 'places:list' %}?category={{ category.slug|urlencode }}#places">{{ category.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </nav>
+        {% endif %}
+
+        <div>
+          <h2 class="footer-title">Before you go</h2>
+          <ul class="footer-tips">
+            <li><i class="bi bi-clock" aria-hidden="true"></i> Opening hours and fees can change</li>
+            <li><i class="bi bi-telephone" aria-hidden="true"></i> Check with the venue before you travel</li>
+            <li><i class="bi bi-signpost-2" aria-hidden="true"></i> Distances are approximate</li>
+          </ul>
+        </div>
       </div>
-      <p class="footer-small">NearbyGo version 1.0, built for the ITE2953 Programming Group Project.</p>
+
+      <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} NearbyGo. Developed and designed by <span class="footer-credit">Ruvin Palihawadana</span>.</p>
+        <p>Information on this site is a guide only. <a href="https://www.openstreetmap.org/copyright" rel="noopener">Map data &copy; OpenStreetMap contributors</a></p>
+      </div>
     </div>
   </footer>
 

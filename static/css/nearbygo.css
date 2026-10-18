@@ -31,6 +31,7 @@
   /* Theme colours */
   --ng-primary: #13357b;        /* royal navy: header, buttons, links */
   --ng-primary-deep: #0c2457;   /* hover and pressed states */
+  --ng-navbar: #0a1633;         /* darker navy so the navbar stands apart from the banners */
   --ng-primary-tint: #e8eef9;   /* soft navy backgrounds */
   --ng-primary-line: #c6d3ee;   /* borders on tinted areas */
   --ng-on-primary-muted: #c9d5f0; /* secondary text on navy */
@@ -93,8 +94,8 @@ a { text-underline-offset: .18em; }
 .btn-outline-light-pill { --bs-btn-color: #fff; --bs-btn-border-color: rgba(255, 255, 255, .7); --bs-btn-hover-bg: rgba(255, 255, 255, .12); --bs-btn-hover-border-color: #fff; --bs-btn-hover-color: #fff; --bs-btn-active-bg: rgba(255, 255, 255, .2); --bs-btn-active-color: #fff; }
 .btn-link-details { --bs-btn-color: var(--ng-primary); --bs-btn-hover-color: var(--ng-primary-deep); padding-left: 0; text-decoration: underline; text-underline-offset: .2em; border-radius: .3rem; }
 
-/* Header: navy bar */
-.site-header { background: var(--ng-primary); color: #fff; }
+/* Header: darker navy bar, so it reads as separate from the navy banners below */
+.site-header { background: var(--ng-navbar); color: #fff; border-bottom: 1px solid rgba(255, 255, 255, .08); }
 .site-header .navbar { padding-block: .7rem; }
 .brand { display: flex; align-items: center; gap: .6rem; color: #fff; }
 .brand:hover, .brand:focus { color: #fff; }
@@ -315,15 +316,24 @@ a { text-underline-offset: .18em; }
 .help-steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center; background: var(--ng-primary); font: 600 1rem/1 var(--ng-heading); color: #fff; }
 .help-steps h2 { font-size: 1.25rem; margin-bottom: .35rem; padding-top: .3rem; }
 
-/* Footer: near-black, as in the Travela template */
-.site-footer { flex-shrink: 0; background: var(--ng-dark); color: #b9bccb; padding: 2.5rem 0 1.5rem; margin-top: auto; }
-.site-footer a { color: #fff; }
-.site-footer a:hover { color: var(--ng-on-primary-muted); }
-.footer-grid { display: grid; gap: 1rem 2rem; }
-@media (min-width: 768px) { .footer-grid { grid-template-columns: 1.4fr 1fr; } }
-.footer-note { display: flex; gap: .55rem; margin: 0; max-width: 40rem; }
-.footer-links { list-style: none; padding: 0; margin: 0; display: grid; gap: .3rem; }
-.footer-small { margin: 1.75rem 0 0; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .1); font-size: .82rem; color: #8a8e9f; }
+/* Footer: near-black, four columns, as in the Travela template */
+.site-footer { flex-shrink: 0; background: var(--ng-dark); color: #b9bccb; padding: 3.5rem 0 1.5rem; margin-top: auto; font-size: .95rem; }
+.footer-grid { display: grid; gap: 2rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 576px) { .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 992px) { .footer-grid { grid-template-columns: 1.5fr 1fr 1.1fr 1.3fr; gap: 2.5rem; } }
+.footer-brand .brand { margin-bottom: 1rem; display: inline-flex; color: #fff; text-decoration: none; }
+.footer-brand p { max-width: 22rem; margin: 0; }
+.footer-title { font-family: var(--ng-heading); font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: 1rem; }
+.footer-links, .footer-tips { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; }
+.footer-links a { color: #b9bccb; text-decoration: none; }
+.footer-links a:hover, .footer-links a:focus-visible { color: #fff; text-decoration: underline; }
+.footer-tips li { display: flex; gap: .6rem; align-items: baseline; }
+.footer-tips i { color: var(--ng-on-primary-muted); }
+.footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 2rem; margin-top: 2.75rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, .1); font-size: .85rem; color: #8a8e9f; }
+.footer-bottom p { margin: 0; }
+.footer-bottom a { color: #b9bccb; }
+.footer-credit { color: #fff; font-weight: 500; }
+.footer-bottom a:hover { color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; scroll-behavior: auto !important; }

@@ -168,8 +168,8 @@ class DetailTests(TestCase):
 
     def test_nfr_sa_01_04_guidance_notice(self):
         r = self.client.get(self.place.get_absolute_url())
-        self.assertContains(r, "guidance only")
-        self.assertContains(r, "Confirm time-sensitive details with the venue")
+        self.assertContains(r, "Information on this site is a guide only.")
+        self.assertContains(r, "Check with the venue before you travel")
 
     def test_xss_safe_output(self):
         self.place.summary = "<script>alert(1)</script>"
@@ -247,7 +247,7 @@ class PerformanceTests(TestCase):
             make_place(category=categories[i % 5], distance_km=Decimal(str(round(i * 0.24, 1))))
 
     def test_nfr_pe_01_place_list_fast_and_query_count_bounded(self):
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             self.client.get(reverse("places:list"))
         durations = []
         for _ in range(20):
