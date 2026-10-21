@@ -67,7 +67,7 @@ class PlaceAdmin(admin.ModelAdmin):
         }),
         ("Location", {
             "description": "Coordinates are shown on the public map. The reference location itself is never shown to visitors.",
-            "fields": (("latitude", "longitude"), "distance_km", "radius_check"),
+            "fields": ("latitude", "longitude", "distance_km", "radius_check"),
         }),
         ("Visiting information", {
             "description": "Leave a field blank if the information cannot be verified. Visitors will see 'Not available'.",
